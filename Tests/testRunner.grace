@@ -1,11 +1,11 @@
 import "io" as io
 import "mirrors" as mirrors
 
-method getTestByName(name) {
+method getSuiteByName(name) {
   io.importModuleByName(name)
 }
 
-method findTestsInModule(module) {
+method findTestsInSuite(module) {
   def names = mirrors.methodNamesForObject(module)
 
   var n := 0
@@ -27,14 +27,14 @@ method findTestsInModule(module) {
   testNames
 }
 
-method runTestsInModule(moduleName) {
-  var testModule := getTestByName(moduleName)
-  var names := findTestsInModule(testModule)
+method runTests(moduleName) {
+  var suite := getSuiteByName(moduleName)
+  var names := findTestsInSuite(suite)
 
-  print("Running tests on " + testModule.asString)
+  print("Running tests in " + suite.asString)
   names.do { name ->
-    print("  " + mirrors.invoke (name) on (testModule))
+    print("  " + mirrors.invoke (name) on (suite))
   }
 }
 
-runTestsInModule(args.at(2.asInteger))
+runTests(args.at(2.asInteger))
