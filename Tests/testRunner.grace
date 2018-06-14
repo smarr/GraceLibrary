@@ -38,8 +38,14 @@ method runTests(moduleName) {
 }
 
 method exe(args) {
-  def n = args.size  
-  runTests(args.at(2.asInteger))
+  def n = args.size
+  (n == 1).ifTrue {
+    runTests("GraceLibrary/Tests/language.grace")
+    runTests("GraceLibrary/Tests/modules.grace")
+    runTests("GraceLibrary/Tests/types.grace")
+  } ifFalse {
+    runTests(args.at(2.asInteger))
+  }
 }
 
 exe(args)
