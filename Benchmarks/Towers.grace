@@ -25,89 +25,77 @@
 //   2018, June
 //
 
-type Disk = interface {
-  setNext(item)
+class Disk(size) {
+    var next
+    method setNext(item) { next := item }
+    method getSize { size }
 }
 
 class Towers {
 
   var piles := platform.kernel.Array.new(4.asInteger)
-  var movesDone := 0
+  var movesDone := 0.asInteger
 
-  class newTowersDisk(size: Number) {
-    var next
-
-    method setNext(item) {
-      next := item
-    }
-
-    method getSize {
-      size
-    }
-  }
-
-  method pushDisk (disk: Disk) onPile (pile: Number) {
-    var top := piles.at(pile.asInteger)
+  method pushDisk (disk) onPile (pile) {
+    var top := piles.at(pile)
     
-    var x := top.isNil
-    if (!x) then {
-      if (disk.getSize >= top.getSize) then {
-        self.error("Cannot put a bigger disk on a smaller one")
+    (!top.isNil).ifTrue {
+      (disk.getSize >= top.getSize).ifTrue {
+        error("Cannot put a bigger disk on a smaller one")
       }
     }
 
     disk.setNext(top)
-    piles.at(pile.asInteger)put(disk)
+    piles.at(pile)put(disk)
   }
 
-  method popDiskFrom(pile: Number) {
-    var top := piles.at(pile.asInteger)
-    var x := top.isNil
-    if (x) then {
-      self.error("Attempting to remove a disk from an empty pile")
+  method popDiskFrom(pile) {
+    var top := piles.at(pile)
+    (top.isNil).ifTrue {
+      error("Attempting to remove a disk from an empty pile")
     }
 
-    piles.at(pile.asInteger)put(top.next)
-    top.setNext(platform.kernel.Nil.new)
+    piles.at(pile)put(top.next)
+    top.setNext(Done)
     top
   }
 
-  method moveTopDiskFrom (fromPile: Number) to (toPile: Number) {
+  method moveTopDiskFrom (fromPile) to (toPile) {
     var disk := popDiskFrom (fromPile)
     pushDisk (disk) onPile (toPile)
-    movesDone := movesDone + 1
+    movesDone := movesDone + 1.asInteger
   }
 
-  method buildTowerAt(pile: Number) disks(disks: Number) {
-    disks.asInteger.downTo(1) do { size ->
-      var disk := newTowersDisk(size)
+  method buildTowerAt(pile) disks(disks) {
+    disks.downTo(1.asInteger) do { size ->
+      var disk := Disk(size)
       pushDisk (disk) onPile (pile)
     }
   }
 
-  method move (disks: Number) disksFrom (fromPile: Number) to (toPile: Number) {
-    (disks == 1).ifTrue {
+  method move (disks) disksFrom (fromPile) to (toPile) {
+    (disks == 1.asInteger).ifTrue {
       moveTopDiskFrom (fromPile) to (toPile)
     } ifFalse {
-      var otherPile := 6 - fromPile - toPile
-      move (disks - 1) disksFrom (fromPile) to (otherPile)
+      var otherPile := 6.asInteger - fromPile - toPile
+      move (disks - 1.asInteger) disksFrom (fromPile) to (otherPile)
       moveTopDiskFrom (fromPile) to (toPile)
-      move (disks - 1) disksFrom (otherPile) to (toPile)
+      move (disks - 1.asInteger) disksFrom (otherPile) to (toPile)
     }
   }
 }
 
-method asString {"Towers.grace"}
+method asString {
+  "Towers.grace"
+}
 
-method benchmark(innerIterations) {
+method benchmark(innerIterations) -> Done {
   1.asInteger.to(innerIterations) do { i ->
-    def towers = Towers
-    towers.buildTowerAt(1) disks(13)
-    towers.move(13) disksFrom(1) to(2)
-
-    def result = towers.movesDone
-    if (result != 8191) then {
-      error("{self} failed, {result} != 8191")
+    var towers := Towers
+    towers.buildTowerAt(1.asInteger) disks(13.asInteger)
+    towers.move(13.asInteger) disksFrom(1.asInteger) to(2.asInteger)
+    (towers.movesDone != 8191.asInteger).ifTrue {
+      error("{self} failed, {towers.movesDone} != 8191")
     }
   }
 }

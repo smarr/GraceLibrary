@@ -23,25 +23,32 @@
 //   2018, June
 //
 
-type ListElement = interface {
-  val
-  next
-  length
+class ListElement(n) {
+  var val := n
+  var next
+  
+  method length {
+    (next.isNil).ifTrue {
+      return 1.asInteger
+    } ifFalse {
+      return 1.asInteger + next.length
+    }
+  } 
 }
 
 class List {
   
-  method makeList(length: Number) {
-    (length == 0). ifTrue {
+  method makeList(length) {
+    (length == 0).ifTrue {
       return Done
     } ifFalse {
-      var e := listElement (length)
+      var e := ListElement(length)
       e.next(makeList(length - 1.asInteger))
       return e
     }
   }
 
-  method isShorter (x: ListElement) than (y: ListElement) {
+  method isShorter (x) than (y) {
     var xTail := x
     var yTail := y
 
@@ -52,11 +59,10 @@ class List {
         xTail := xTail.next
         yTail := yTail.next
     }
-    
     false
   }
 
-  method talkWithX (x: ListElement) withY (y: ListElement) withZ (z: ListElement) {
+  method talkWithX (x) withY (y) withZ (z) {
     (isShorter (y) than (x)).ifTrue {
       return talkWithX (talkWithX (x.next) withY (y) withZ (z) )
                  withY (talkWithX (y.next) withY (z) withZ (x) )
@@ -66,28 +72,22 @@ class List {
     }
   }
 
-  class listElement (n: Number) {
-    var val := n
-    var next
-    
-    method length {
-      (next.isNil).ifTrue {
-        return 1
-      } ifFalse {
-        return 1 + next.length
-      }
-    } 
-  }
+  
 }
 
-method asString {"List.grace"}
+method asString {
+  "ListUntyped.grace"
+}
 
 method benchmark(innerIterations) {
+  var instance := List
+
   1.asInteger.to(innerIterations) do { i ->
-    var instance := List 
     var result := instance.talkWithX (instance.makeList(15)) withY (instance.makeList(10)) withZ (instance.makeList(6)).length
     if (result != 10) then {
       error("{self} failed, {result} != 10")
     }
   }
+
+  Done
 }
