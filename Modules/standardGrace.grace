@@ -1,3 +1,5 @@
+type Done = interface {}
+
 type Number = interface {
   + (other)
   - (other)
@@ -13,6 +15,12 @@ type String = interface {
 type Boolean = interface {
   and (other)
   or (other)
+}
+
+type List = interface {
+  at(ix)
+  at(ix)put(value)
+  size
 }
 
 method print(x) {
